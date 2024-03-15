@@ -1,0 +1,27 @@
+openapi: '3.0.2'
+info:
+  title: Api de Psicopedagogia
+  version: '1.0'
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: http://psicopedagogia-api.com
+    description: Test server
+tags:
+  - name: Problematicas
+    description: Rutas de manejo de las problematicas
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  /problematicas:
+    get: 
+      tags:
+        - Problematicas
+      responses:
+        '200':
+          description: OK
+  

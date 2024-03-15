@@ -1,0 +1,43 @@
+name: API CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    types: [opened, synchronize]
+    
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+    - name: Install dependencies
+      run: npm ci
+    - name: Eslint
+      run: npm run lint
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run docker-compose
+      run: docker-compose -f ./docker-compose-test.yaml up -d --build
+    - name: Initialize database
+      run: docker exec -i test-node npm run initDB
+    - name: Run Unit Test
+      run: docker exec -i test-node npm run test:run
+  deploy:
+    if: ${{ github.event_name == 'push'}}
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: npm ci
+    - name: Build 
+      run: npm run tsc
+    - name: Start with pm2
+      run: pm2 start build/index.js
+      
